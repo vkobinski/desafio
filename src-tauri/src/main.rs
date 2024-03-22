@@ -22,28 +22,30 @@ fn greet(state: tauri::State<'_, ProdutoState>, name: &str) -> String {
 struct ProdutoState {
   t: std::sync::Mutex<Vec<Produto>>,
 }
-// remember to call `.manage(MyState::default())`
 #[tauri::command]
-async fn create_produto(state: tauri::State<'_, ProdutoState>, nome: &str, descricao: &str, valor: &str, disponivel: &str) -> Result<(), String> {
+async fn create_produto(state: tauri::State<'_, ProdutoState>, nome: &str, descricao: &str, valor: &str, disponivel: bool) -> Result<String, String> {
 
     let novo_produto = Produto {
         nome: nome.into(),
         descricao: descricao.into(),
         valor: valor.parse().unwrap(),
-        disponivel: disponivel.parse().unwrap(),
+        disponivel
     };
 
     println!("Novo produto: {:?}", novo_produto);
 
     state.t.lock().unwrap().push(novo_produto);
-    Ok(())
+    Ok(String::from("Produto criado com sucesso!"))
+}
+
+async fn get_produto(state: tauri::State<'_, ProdutoState>, nome: &str) -> Result<Vec<Produto>, String> {
+    todo!()
 }
 
 fn main() {
 
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
-        .invoke_handler(tauri::generate_handler![create_produto])
+        .invoke_handler(tauri::generate_handler![greet, create_produto])
         .manage(ProdutoState::default())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
