@@ -3,8 +3,6 @@
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 
-use std::{os::unix::process, sync::{Arc, Mutex}};
-
 #[derive(Debug)]
 struct Produto {
     nome: String,
