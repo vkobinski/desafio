@@ -2,77 +2,22 @@ import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
+import { useCallback } from "react";
+import { useSort } from "@table-library/react-table-library/sort";
+import { useTheme } from '@table-library/react-table-library/theme';
+import { DEFAULT_OPTIONS, getTheme } from '@table-library/react-table-library/material-ui';
 
-import {
-  Table,
-  Header,
-  HeaderRow,
-  Body,
-  Row,
-  HeaderCell,
-  Cell,
-} from "@table-library/react-table-library/table";
-import {
-  useSort,
-  HeaderCellSort,
-} from "@table-library/react-table-library/sort";
+import { CompactTable } from '@table-library/react-table-library/compact';
 
-function Tabela(produtos) {
-
-  const data = { nodes: produtos };
-
-  const sort = useSort(
-    data,
-    {
-      onChange: null,
-    },
-    {
-      sortFns: {
-        VALOR: (array) => array.sort((a, b) => a.name.localeCompare(b.name)),
-      },
-    }
-  );
-
-  return (
-    <Table data={data} sort={sort}>
-      {(tableList) => (
-        <>
-          <Header>
-            <HeaderRow>
-              <HeaderCell>Nome</HeaderCell>
-              <HeaderCellSort sortKey="Valor">Valor</HeaderCellSort>
-              <HeaderCell>Descrição</HeaderCell>
-              <HeaderCell>Disponível</HeaderCell>
-            </HeaderRow>
-          </Header>
-
-          <Body>
-            {tableList.map((item) => (
-              <Row item={item} key={item.id}>
-                <Cell>{item.nome}</Cell>
-                <Cell>{item.valor}</Cell>
-                <Cell>{item.descricao}</Cell>
-                <Cell>{item.disponivel == true ? "Sim" : "Não"}</Cell>
-              </Row>
-            ))}
-          </Body>
-        </>
-      )}
-    </Table>
-  );
-
-}
-
-
-//const COLUMNS = [
-//{ label: 'Nome', renderCell: (item) => item["nome"] },
-//{ label: 'Valor', renderCell: (item) => item["valor"], sort: {sortKey: "VALOR"} },
-//{ label: 'Descrição', renderCell: (item) => item["descricao"] },
-//{
-//label: 'Disponível',
-//renderCell: (item) => item["disponivel"] == true ? "Sim" : "Não",
-//},
-//];
+const COLUMNS = [
+  { label: 'Nome', renderCell: (item) => item["nome"] },
+  { label: 'Valor', renderCell: (item) => item["valor"], sort: { sortKey: "VALOR" } },
+  { label: 'Descrição', renderCell: (item) => item["descricao"] },
+  {
+    label: 'Disponível',
+    renderCell: (item) => item["disponivel"] == true ? "Sim" : "Não",
+  },
+];
 
 
 
@@ -81,6 +26,7 @@ function App() {
   const [produtos, setProdutos] = useState(
     [{ "nome": "oi", "descricao": "teste", "valor": 10, "disponivel": true }]
   );
+  const [maior, setMaior] = useState(true);
   const [tabelaComponent, setTabelaComponent] = useState(null);
 
   async function get_produtos() {
@@ -88,21 +34,46 @@ function App() {
 
     setProdutos(response);
 
+
   };
+
+  const materialTheme = getTheme(DEFAULT_OPTIONS);
+  const theme = useTheme(getTheme());
 
   useEffect(() => {
     get_produtos();
 
   }, []);
 
-  // const Tabela = useCallback(() => {
-  //   const data = { nodes: produtos };
+  const data = { nodes: produtos };
 
-  //   return <CompactTable columns={COLUMNS} data={data} />;
-  // }, [produtos]);
+  const sort = useSort(
+    data,
+    {
+      onChange: onSortChange,
+    },
+    {
+
+      sortFns: {
+        VALOR: () => null,
+      },
+    }
+  );
+
+  function onSortChange(action, state) {
+    if(action.type == "TOGGLE_SORT") {
+      setMaior(!maior);
+    }
+  }
+
+  const Tabela = useCallback(() => {
+    const data = { nodes: produtos };
+
+    return <CompactTable columns={COLUMNS} data={data} sort={sort} theme={theme} />;
+  }, [produtos]);
 
   useEffect(() => {
-    const TabelaComponent = Tabela(produtos);
+    const TabelaComponent = Tabela();
     setTabelaComponent(TabelaComponent);
   }, [produtos]);
 
