@@ -24,10 +24,3 @@
   height: 20px;
   background-color: black;
 }
-
-.tabela {
-  display: flex-box;
-  align-self: center;
-  justify-content: center;
-  width: 800px;
-}

@@ -1,66 +1,124 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 
+import {
+  Table,
+  Header,
+  HeaderRow,
+  Body,
+  Row,
+  HeaderCell,
+  Cell,
+} from "@table-library/react-table-library/table";
+import {
+  useSort,
+  HeaderCellSort,
+} from "@table-library/react-table-library/sort";
+
+function Tabela(produtos) {
+
+  const data = { nodes: produtos };
+
+  const sort = useSort(
+    data,
+    {
+      onChange: null,
+    },
+    {
+      sortFns: {
+        VALOR: (array) => array.sort((a, b) => a.name.localeCompare(b.name)),
+      },
+    }
+  );
+
+  return (
+    <Table data={data} sort={sort}>
+      {(tableList) => (
+        <>
+          <Header>
+            <HeaderRow>
+              <HeaderCell>Nome</HeaderCell>
+              <HeaderCellSort sortKey="Valor">Valor</HeaderCellSort>
+              <HeaderCell>Descrição</HeaderCell>
+              <HeaderCell>Disponível</HeaderCell>
+            </HeaderRow>
+          </Header>
+
+          <Body>
+            {tableList.map((item) => (
+              <Row item={item} key={item.id}>
+                <Cell>{item.nome}</Cell>
+                <Cell>{item.valor}</Cell>
+                <Cell>{item.descricao}</Cell>
+                <Cell>{item.disponivel == true ? "Sim" : "Não"}</Cell>
+              </Row>
+            ))}
+          </Body>
+        </>
+      )}
+    </Table>
+  );
+
+}
+
+
+//const COLUMNS = [
+//{ label: 'Nome', renderCell: (item) => item["nome"] },
+//{ label: 'Valor', renderCell: (item) => item["valor"], sort: {sortKey: "VALOR"} },
+//{ label: 'Descrição', renderCell: (item) => item["descricao"] },
+//{
+//label: 'Disponível',
+//renderCell: (item) => item["disponivel"] == true ? "Sim" : "Não",
+//},
+//];
+
+
+
 function App() {
-  const [greetMsg, setGreetMsg] = useState("oi");
-  const [nome, setNome] = useState("");
-  const [descricao, setDescricao] = useState("");
-  const [valor, setValor] = useState("");
-  const [disponivel, setDisponivel] = useState(true);
+  const [resultMsg, setResultMsg] = useState("");
+  const [produtos, setProdutos] = useState(
+    [{ "nome": "oi", "descricao": "teste", "valor": 10, "disponivel": true }]
+  );
+  const [tabelaComponent, setTabelaComponent] = useState(null);
 
-  async function create_produto() {
+  async function get_produtos() {
+    let response = await invoke("get_produtos", { maior: true });
 
-    console.log(nome, descricao, valor, disponivel);
-
-    const response = await invoke("create_produto", { nome: nome, descricao: descricao, valor: valor, disponivel });
-
-    setGreetMsg(response);
+    setProdutos(response);
 
   };
 
+  useEffect(() => {
+    get_produtos();
+
+  }, []);
+
+  // const Tabela = useCallback(() => {
+  //   const data = { nodes: produtos };
+
+  //   return <CompactTable columns={COLUMNS} data={data} />;
+  // }, [produtos]);
+
+  useEffect(() => {
+    const TabelaComponent = Tabela(produtos);
+    setTabelaComponent(TabelaComponent);
+  }, [produtos]);
+
+
   return (
     <div className="container">
-      <h1>Welcome to Tauri!</h1>
+      <h1>Lista de Produtos</h1>
 
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
+      <div className="tabela">
+        {tabelaComponent}
+      </div>
 
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          create_produto();
-        }}
-      >
-        <input
-          id="nome-input"
-          onChange={(e) => setNome(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <input
-          id="descricao-input"
-          onChange={(e) => setDescricao(e.currentTarget.value)}
-          placeholder="Enter a description..."
-        />
-        <input
-          id="valor-input"
-          type="number"
-          onChange={(e) => setValor(e.currentTarget.value)}
-          placeholder="Enter a value..."
-        />
-        <input
-          id="disponivel-input"
-          type="checkbox"
-          checked={disponivel}
-          onChange={(e) => setDisponivel(e.currentTarget.checked)}
-        />
-        <button type="submit">Create Produto</button>
-      </form>
-
-      <p>{greetMsg}</p>
+      <p>{resultMsg}</p>
     </div>
   );
+
 }
 
 export default App;

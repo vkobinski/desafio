@@ -3,9 +3,15 @@
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 
-use std::{os::unix::process, sync::{Arc, Mutex}};
+use std::{
+    os::unix::process,
+    sync::{Arc, Mutex},
+};
 
-#[derive(Debug)]
+use serde::Serialize;
+use serde_json::Value;
+
+#[derive(Debug, Serialize)]
 struct Produto {
     nome: String,
     descricao: String,
@@ -20,16 +26,21 @@ fn greet(state: tauri::State<'_, ProdutoState>, name: &str) -> String {
 
 #[derive(Default)]
 struct ProdutoState {
-  t: std::sync::Mutex<Vec<Produto>>,
+    t: std::sync::Mutex<Vec<Produto>>,
 }
 #[tauri::command]
-async fn create_produto(state: tauri::State<'_, ProdutoState>, nome: &str, descricao: &str, valor: &str, disponivel: bool) -> Result<String, String> {
-
+async fn create_produto(
+    state: tauri::State<'_, ProdutoState>,
+    nome: &str,
+    descricao: &str,
+    valor: &str,
+    disponivel: bool,
+) -> Result<String, String> {
     let novo_produto = Produto {
         nome: nome.into(),
         descricao: descricao.into(),
         valor: valor.parse().unwrap(),
-        disponivel
+        disponivel,
     };
 
     println!("Novo produto: {:?}", novo_produto);
@@ -38,14 +49,31 @@ async fn create_produto(state: tauri::State<'_, ProdutoState>, nome: &str, descr
     Ok(String::from("Produto criado com sucesso!"))
 }
 
-async fn get_produto(state: tauri::State<'_, ProdutoState>, nome: &str) -> Result<Vec<Produto>, String> {
-    todo!()
+#[tauri::command]
+async fn get_produtos(state: tauri::State<'_, ProdutoState>, maior: bool) -> Result<Value, String> {
+    {
+        let novo_produto = Produto {
+            nome: "teste".into(),
+            descricao: "teste".into(),
+            valor: 10.0,
+            disponivel: true,
+        };
+
+        state.t.lock().unwrap().push(novo_produto);
+    }
+
+    let produtos = state.t.lock().unwrap();
+
+    Ok(serde_json::json!(*produtos))
 }
 
 fn main() {
-
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, create_produto])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            create_produto,
+            get_produtos
+        ])
         .manage(ProdutoState::default())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
