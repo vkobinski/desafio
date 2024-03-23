@@ -4,7 +4,7 @@ import "./tabela.css";
 import { useCallback } from "react";
 import { useSort } from "@table-library/react-table-library/sort";
 import { useTheme } from '@table-library/react-table-library/theme';
-import { DEFAULT_OPTIONS, getTheme } from '@table-library/react-table-library/material-ui';
+import { DEFAULT_OPTIONS, getTheme } from '@table-library/react-table-library/chakra-ui';
 
 import { CompactTable } from '@table-library/react-table-library/compact';
 
@@ -34,15 +34,11 @@ function Tabela(props ) {
     async function get_produtos() {
         let response = await invoke("get_produtos", { maior: maior });
 
-        console.log(response);
-
         setProdutos(response);
-
-
     };
 
     const materialTheme = getTheme(DEFAULT_OPTIONS);
-    const theme = useTheme(getTheme());
+    const theme = useTheme(materialTheme);
 
     useEffect(() => {
         get_produtos();
