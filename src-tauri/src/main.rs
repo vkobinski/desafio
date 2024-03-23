@@ -3,11 +3,6 @@
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 
-use std::{
-    os::unix::process,
-    sync::{Arc, Mutex},
-};
-
 use serde::Serialize;
 use serde_json::Value;
 
@@ -20,7 +15,7 @@ struct Produto {
 }
 
 #[tauri::command]
-fn greet(state: tauri::State<'_, ProdutoState>, name: &str) -> String {
+fn greet(_state: tauri::State<'_, ProdutoState>, name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
@@ -51,18 +46,13 @@ async fn create_produto(
 
 #[tauri::command]
 async fn get_produtos(state: tauri::State<'_, ProdutoState>, maior: bool) -> Result<Value, String> {
-    {
-        let novo_produto = Produto {
-            nome: "teste".into(),
-            descricao: "teste".into(),
-            valor: 10.0,
-            disponivel: true,
-        };
 
-        state.t.lock().unwrap().push(novo_produto);
+    let mut produtos = state.t.lock().unwrap();
+
+    match maior {
+        true => produtos.sort_by(|a, b| a.valor.partial_cmp(&b.valor).unwrap()),
+        false => produtos.sort_by(|a, b| b.valor.partial_cmp(&a.valor).unwrap())
     }
-
-    let produtos = state.t.lock().unwrap();
 
     Ok(serde_json::json!(*produtos))
 }

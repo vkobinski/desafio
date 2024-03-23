@@ -2,7 +2,10 @@ import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./cadastro.css";
 
-function Cadastro() {
+function Cadastro(props) {
+
+  const  setShowTabela  = props.setShowTabela;
+
   const [resultMsg, setResultMsg] = useState("");
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -14,6 +17,11 @@ function Cadastro() {
     const response = await invoke("create_produto", { nome: nome, descricao: descricao, valor: valor, disponivel });
 
     setResultMsg(response);
+
+    setTimeout(() => {
+      setShowTabela(true);
+      
+    }, 3000);
 
   };
 

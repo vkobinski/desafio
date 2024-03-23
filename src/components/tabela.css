@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+.container {
+  font-family: "Inter", sans-serif;
+}
+
+.produto {
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  align-self: center;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  background-color: black;
+}
+
+.tabela {
+  display: flex-box;
+  align-self: center;
+  justify-content: center;
+  width: 800px;
+}
