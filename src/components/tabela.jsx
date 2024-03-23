@@ -87,7 +87,8 @@ function Tabela(props ) {
         <div className="container">
             <h1>Lista de Produtos</h1>
 
-            <button onClick={() => setShowTabela(false)}>
+            <button className="botao"
+             onClick={() => setShowTabela(false)}>
                 Cadastrar Item
             </button>
 

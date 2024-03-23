@@ -31,3 +31,9 @@
   justify-content: center;
   width: 800px;
 }
+
+.botao {
+  width: fit-content;
+  margin: 10px;
+  align-self: center;
+}
