@@ -18,7 +18,7 @@ struct Produto {
 }
 
 async fn get_pool() -> Result<SqlitePool, sqlx::Error> {
-    const DB_URL: &str = "sqlite://../sqlite.db";
+    const DB_URL: &str = "sqlite://sqlite.db";
 
     if !Sqlite::database_exists(DB_URL).await.unwrap_or(false) {
         println!("Database does not exist, creating...");
