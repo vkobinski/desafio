@@ -30,6 +30,7 @@
   align-self: center;
   justify-content: center;
   width: 800px;
+  border-radius: 20%;
 }
 
 .botao {
