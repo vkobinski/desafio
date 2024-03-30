@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM produtos",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "nome",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "descricao",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "valor",
+        "ordinal": 3,
+        "type_info": "Float"
+      },
+      {
+        "name": "disponivel",
+        "ordinal": 4,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1eb7cbd5492bb08206cb0205f2970a199392c7cde04648259c6d23cbef0ba99d"
+}
